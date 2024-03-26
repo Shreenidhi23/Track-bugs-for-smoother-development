@@ -1,0 +1,80 @@
+import tkinter as tk
+import tkinter.simpledialog
+import tkinter.messagebox
+
+class BugTrackerApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Bug Tracker")
+        self.root.geometry("400x300")
+
+        self.bugs = []
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        self.title_label = tk.Label(self.root, text="Bug Tracker", font=("Arial", 16))
+        self.title_label.pack(pady=10)
+
+        self.create_button = tk.Button(self.root, text="Create Bug", command=self.create_bug)
+        self.create_button.pack()
+
+        self.view_button = tk.Button(self.root, text="View Bugs", command=self.view_bugs)
+        self.view_button.pack()
+
+        self.update_button = tk.Button(self.root, text="Update Status", command=self.update_status)
+        self.update_button.pack()
+
+        self.close_button = tk.Button(self.root, text="Close Bug", command=self.close_bug)
+        self.close_button.pack()
+
+        self.exit_button = tk.Button(self.root, text="Exit", command=self.root.destroy)
+        self.exit_button.pack(pady=10)
+
+    def create_bug(self):
+        title = tk.simpledialog.askstring("Create Bug", "Enter bug title:")
+        if title:
+            description = tk.simpledialog.askstring("Create Bug", "Enter bug description:")
+            if description:
+                bug_id = len(self.bugs) + 1
+                self.bugs.append({"id": bug_id, "title": title, "description": description, "status": "Open"})
+                tk.messagebox.showinfo("Bug Created", f"Bug {bug_id} created successfully.")
+
+    def view_bugs(self):
+        bug_info = ""
+        for bug in self.bugs:
+            bug_info += f"ID: {bug['id']} - Title: {bug['title']} - Status: {bug['status']}\n"
+        tk.messagebox.showinfo("Bug List", bug_info)
+
+    def update_status(self):
+        selected_bug_id = tk.simpledialog.askinteger("Update Status", "Enter bug ID:")
+        if selected_bug_id:
+            selected_bug = None
+            for bug in self.bugs:
+                if bug['id'] == selected_bug_id:
+                    selected_bug = bug
+                    break
+            if selected_bug:
+                new_status = tk.simpledialog.askstring("Update Status", "Enter new status:")
+                if new_status:
+                    selected_bug['status'] = new_status
+                    tk.messagebox.showinfo("Status Updated", f"Status updated for Bug {selected_bug_id}.")
+                    self.view_bugs()
+            else:
+                tk.messagebox.showerror("Error", f"Bug with ID {selected_bug_id} not found.")
+
+    def close_bug(self):
+        selected_bug_id = tk.simpledialog.askinteger("Close Bug", "Enter bug ID to close:")
+        if selected_bug_id:
+            for bug in self.bugs:
+                if bug['id'] == selected_bug_id:
+                    bug['status'] = "Closed"
+                    tk.messagebox.showinfo("Bug Closed", f"Bug {selected_bug_id} closed successfully.")
+                    self.view_bugs()
+                    return
+            tk.messagebox.showerror("Error", f"Bug with ID {selected_bug_id} not found.")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = BugTrackerApp(root)
+    root.mainloop()
